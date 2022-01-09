@@ -43,7 +43,9 @@
       <button id="getInterestedUsers" style="visibility:hidden;">Confirm interested users?</button>
     </div>
     <div class="container container2">
-      <h1 id="tripType">Trip Details</h1>
+      <div class="tripDetails">
+        <h1>Trip Details</h1><span id="madeBy"></span>
+      </div>
       <hr>
       <div class="specific-trip-info-container">
         <p id="tripId">Trip Id: </p>
@@ -57,10 +59,9 @@
         <p id="region">Region: </p>
         <p id="country">Country: </p>
         <p id="weatherDesc"> Description: </p>
-        <p id="temp">Temperature: </p>
         <img id="img" src='https://upload.wikimedia.org/wikipedia/commons/4/46/Question_mark_%28black%29.svg'>
         <p id="error" class="leave-space"></p>
-        <canvas id="myChart" style="width:100%;max-width:700px"></canvas>
+        <canvas id="weatherChart"></canvas>
       </div>
     </div>
   </div>

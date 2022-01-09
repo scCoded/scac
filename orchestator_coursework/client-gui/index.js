@@ -60,8 +60,62 @@ async function generateId(idType) {
         })
         .catch(err => console.log(err));
 };
+function loadChart(hourlyData, region, date) {
+    var x = [];
+    var y = [];
+    var pointStyles = [];
+    hourlyData.forEach(hour => {
+        var img = new Image();
+        img.src = hour.weatherIconUrl[0].value;
+        img.height = 20;
+        img.width = 20;
+        pointStyles.push(img);
+        x.push(hour.time);
+        y.push(hour.tempC);
+    });
+    new Chart(document.getElementById('weatherChart'), {
+        type: 'line',
+        plugins: {
+            afterUpdate: chart => {
+                chart.getDatasetMeta(0).data.forEach((d, i) => d._model.pointStyle = pointStyles[i]);
+            }
+        },
+        data: {
+            labels: x,
+            datasets: [{
+            data: y,
+            pointRadius: 3
+            }]
+        },
+        options: {
+            legend: {
+                display: false
+            },
+            title: {
+                display: true,
+                text: 'Temperature against Time for ' + region + ' on the ' + date
+            },
+            scales: {
+                xAxes: [ {
+                  display: true,
+                  scaleLabel: {
+                    display: true,
+                    labelString: 'Time (3 Hour Intervals)'
+                  }
+                } ],
+                yAxes: [ {
+                  display: true,
+                  scaleLabel: {
+                    display: true,
+                    labelString: 'Temperature oC'
+                  }
+                } ]
+              }
+        }
+    });
+}
 
-function getTripWeatherAndInfo(tripType) {
+function getTripWeatherAndInfo(tripType, madeBy) {
     var interestedTrip = JSON.parse(document.getElementById(tripType).value);
     var longitude = interestedTrip.longitude;
     var latitude = interestedTrip.latitude;
@@ -85,9 +139,11 @@ function getTripWeatherAndInfo(tripType) {
                 $("#region").text("Region: " + res.locationData[0].region[0]);
                 $("#country").text("Country: " + res.locationData[0].country[0]);
                 $("#weatherDesc").text("Description: " + res.weatherDesc);
-                $("#temp").text("Temperature: " + res.FeelsLikeC + "c");
                 $("#img").attr("src", res.weatherIconUrl);
                 $("#error").text("");
+                loadChart(res.hourly, res.locationData[0].region[0], date);
+                document.getElementById('weatherChart').style.visibility = "visible";
+                $("#madeBy").text(madeBy);
             } else {
                 $("#tripId").text("Trip Id: " + tripId);
                 $("#date").text("Date: " + date);
@@ -95,9 +151,10 @@ function getTripWeatherAndInfo(tripType) {
                 $("#region").text("Region: ");
                 $("#country").text("Country: ");
                 $("#weatherDesc").text("Description: ");
-                $("#temp").text("Temperature: ");
                 $("#img").attr("src", 'https://upload.wikimedia.org/wikipedia/commons/4/46/Question_mark_%28black%29.svg');
                 $("#error").text(res.msg);
+                document.getElementById('weatherChart').style.visibility = "hidden";
+                $("#madeBy").text(madeBy);
             }
         })
         .catch(err => console.log(err));
@@ -107,11 +164,12 @@ function getTripWeatherAndInfo(tripType) {
 //https://www.worldweatheronline.com/developer/api/docs/search-api.aspx#q
 document.getElementById('otherTrips').onchange = function() {
     $("#interestedUsers").text("");
-    getTripWeatherAndInfo('otherTrips'); 
+    var userId = JSON.parse(document.getElementById('otherTrips').value).creatorUserId;
+    getTripWeatherAndInfo('otherTrips', ' (Made by User ' + userId + ")");
 };
 
 document.getElementById('usersTrips').onchange = function() {
-    getTripWeatherAndInfo('usersTrips');
+    getTripWeatherAndInfo('usersTrips', ' (Made by You)');
     getInterestedUsers();
 };
 

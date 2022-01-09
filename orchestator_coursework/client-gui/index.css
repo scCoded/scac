@@ -82,4 +82,20 @@ img {
 
 span {
     font-size: 10px;
-} 
+}
+
+canvas {
+    width:100%;
+    max-width:700px;
+    min-height: 200px;
+}
+
+.tripDetails {
+    overflow: hidden;
+    display: table-cell;
+}
+
+.tripDetails span{
+    font-size: 14px;
+    vertical-align: -webkit-baseline-middle;
+}

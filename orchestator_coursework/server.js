@@ -142,12 +142,9 @@ app.get("/generateId/:idType", async (req, res) => {
 app.get(`/weather/:tripId/:location/:date`, async (req, res) => {
   var weather = JSON.parse(fs.readFileSync('weather.json'));
   if (weather.hasOwnProperty(req.params.tripId)) {
-    console.log("sent from weather json file");
+    console.log("Sent from weather json file");
     res.send(weather[req.params.tripId]);
   } else {
-    //* search weather.json to see if we have info for this location + date already
-    //if not call api and save to weather.json after.
-    //console.log(req.params.location);
     try {
       //*create on FE weather graph on RHS of page. For other rest calls display other info on RHS too!
       /*
@@ -163,6 +160,7 @@ app.get(`/weather/:tripId/:location/:date`, async (req, res) => {
         weatherDesc: result.data.data.current_condition[0].weatherDesc[0].value,
         observation_time: result.data.data.current_condition[0].observation_time,
         FeelsLikeC: result.data.data.current_condition[0].FeelsLikeC,
+        hourly: result.data.data.weather[0].hourly,
         locationData: []
       }
       try {
