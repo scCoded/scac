@@ -1,59 +1,72 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>REST Client</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-    <link rel="stylesheet" href="./index.css">
-  </head>
-  <body>
-    <div class="row">
-      <div class="container">
-        <div>
-          <i class="material-icons">language</i>
-          <h1 id ="title">Travel Client</h1>
-        </div>
-        <hr>
-        <p>Search Other existing trips and show interest</p>
-        <button id="getOtherTrips">Get Other Trips</button>
-        <br>
-        <div id="showTrips"></div>
-        <select id="trips" style="visibility:hidden;"></select>
-        <button id="confirmInterest" style="visibility:hidden;">Confirm Interest</button>
-        <hr>
-        <p>Submit a Trip</p>
-        <form>
-          <label>longitude:</label>
-          <input id="longitude" type="number" step="0.0001"/>
-          <label>latitude:</label>
-          <input id="latitude" type="number" step="0.0001"/>
-          <label for="tripDate">Trip proposal date:</label>
-          <input type="date" id="tripDate">
-          <input type="submit"/>
-        </form>
-        <hr>
-        <p>See who's interested in your trip proposals</p>
-        <button id="getUsersTrips">Get Your Trip Proposals</button>
-        <br>
-        <div id="showUsersTrips"></div>
-        <select id="usersTrips" style="visibility:hidden;"></select>
-        <button id="getInterestedUsers" style="visibility:hidden;">See interested users</button>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>REST Client</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="./index.css">
+</head>
+
+<body>
+  <div class="row">
+    <div class="container">
+      <div>
+        <i class="material-icons">language</i>
+        <h1 id="title">Travel Client</h1>
       </div>
-      <div class="container weather-container" id="weatherData">
-        <h2>Weather</h2>
-        <p id="tripId">Trip Id:  </p>
+      <hr>
+      <p>Search Other existing trips and show interest</p>
+      <button id="getOtherTrips">Get Other Trips</button>
+      <br>
+      <div id="showOtherTrips"></div>
+      <select id="otherTrips" style="visibility:hidden;"></select>
+      <button id="confirmInterest" style="visibility:hidden;">Confirm Interest</button>
+      <hr>
+      <p>Submit a Trip</p>
+      <form>
+        <label>longitude:</label>
+        <input id="longitude" type="number" step="0.0001" />
+        <label>latitude:</label>
+        <input id="latitude" type="number" step="0.0001" />
+        <label for="tripDate">Trip proposal date:</label>
+        <input type="date" id="tripDate">
+        <input type="submit" />
+      </form>
+      <hr>
+      <p>See who's interested in your trip proposals</p>
+      <button id="getUsersTrips">Get Your Trip Proposals</button>
+      <br>
+      <div id="showUsersTrips"></div>
+      <select id="usersTrips" style="visibility:hidden;"></select>
+      <button id="getInterestedUsers" style="visibility:hidden;">Confirm interested users?</button>
+    </div>
+    <div class="container container2">
+      <h1 id="tripType">Trip Details</h1>
+      <hr>
+      <div class="specific-trip-info-container">
+        <p id="tripId">Trip Id: </p>
+        <p id="date">Date: </p>
+        <p id="interestedUsers" class="leave-space"> </p>
+      </div>
+      <hr>
+      <div class="weather-container">
+        <h3>Weather</h2>
         <p id="area">Area: </p>
         <p id="region">Region: </p>
         <p id="country">Country: </p>
         <p id="weatherDesc"> Description: </p>
         <p id="temp">Temperature: </p>
         <img id="img" src='https://upload.wikimedia.org/wikipedia/commons/4/46/Question_mark_%28black%29.svg'>
-        <br>
-        <p id="error"></p>
+        <p id="error" class="leave-space"></p>
+        <canvas id="myChart" style="width:100%;max-width:700px"></canvas>
       </div>
     </div>
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
-    <script type="text/javascript" src="./index.js"></script>
-  </body>
+  </div>
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
+  <script type="text/javascript" src="./index.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+</body>
+
 </html>

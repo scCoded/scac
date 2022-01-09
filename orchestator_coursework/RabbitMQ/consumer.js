@@ -138,6 +138,7 @@ module.exports.consume = async () => {
                         }
                     } else {
                         console.log("Invalid json message, so disregarding...");
+                        console.log(jsonObject);
                     }
                 }, {
                     noAck: true

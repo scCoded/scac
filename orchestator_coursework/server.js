@@ -81,14 +81,28 @@ function getInterestedUsers(tripId) {
   return interestedUsers;
 }
 
-app.get("/generateId", async (req, res) => {
-  //*save new user to client.json
+function isValidUser(userId) {
+  var data = JSON.parse(fs.readFileSync('clients.json'));
+  for (var i in data.clients) {
+    if (data.clients[i].clientId === userId && data.clients[i].userType === "local") {
+      return {"valid": true};
+    }
+  }
+  return {"valid": false};
+}
+app.get(`/validateUserId/:userId`, async (req, res) => {
+  res.send(isValidUser(req.params.userId));
+});
+
+
+
+app.get("/generateId/:idType", async (req, res) => {
   var json = {
     "jsonrpc": "2.0",
     "method": "generateIntegers",
     "params": {
       "apiKey": "6e5ab537-e381-44bf-9144-38c7e90d93f7",
-      "n": 4,
+      "n": 9,
       "min": 0,
       "max": 9
     },
@@ -100,25 +114,27 @@ app.get("/generateId", async (req, res) => {
     (result.data.result.random.data).forEach(number => {
       id += number;
     });
-    var data = JSON.parse(fs.readFileSync('clients.json'));
-    var duplicateId = false;
-    for (i in data.clients) {
-      if (data.clients[i].clientId === id) {
-        duplicateId = true;
+    if (req.params.idType === "user") { 
+      var data = JSON.parse(fs.readFileSync('clients.json'));
+      var duplicateId = false;
+      for (i in data.clients) {
+        if (data.clients[i].clientId === id) {
+          duplicateId = true;
+        }
+      }
+      if (!duplicateId) {
+        data.clients.push({clientId: id, userType:"local", trips:[]});
+        fs.writeFile('clients.json', JSON.stringify(data), function (err) {
+          if (err) {
+            console.log(err);
+          }
+          console.log("The file was saved with new local user!");
+        });
       }
     }
-    if (!duplicateId) {
-      data.clients.push({clientId: id, userType:"local", trips:[]});
-      fs.writeFile('clients.json', JSON.stringify(data), function (err) {
-        if (err) {
-          console.log(err);
-        }
-        console.log("The file was saved with new local user!");
-      });
-    }
     res.send(id);
-  } catch (err2) {
-    console.error(err2);
+  } catch (err) {
+    console.error(err);
   }
 });
 

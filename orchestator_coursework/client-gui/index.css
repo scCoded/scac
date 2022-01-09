@@ -3,6 +3,11 @@
     padding: 0;
     box-sizing: border-box;
 }
+
+body {
+    background-color: lightsteelblue;
+}
+
 hr {
     border: 0;
     clear:both;
@@ -23,7 +28,7 @@ hr {
     justify-content: center;
     align-items: center;
     border:2px solid black;
-    background-color: lightsteelblue;
+    border-bottom: none;
     padding:30px;
 }
 .row:after {
@@ -67,6 +72,14 @@ img {
     height: 40px;
 }
 
-.weather-container p, .weather-container h2, .weather-container img {
-    align-self: baseline;
+.container2 {
+    align-items: baseline;
 }
+
+.leave-space {
+    display: inline-block;
+}
+
+span {
+    font-size: 10px;
+} 
