@@ -36,7 +36,7 @@ function checkIfTripDuplicate(data) {
         for (trip in client.trips) {
             if (trip.tripId === jsonObject.tripId) {
                 console.log("Trip id:" + trip.tripId + " is already there for user id:" + trip.creatorUserId);
-                return true;    
+                return true;
             }
         }
     }
@@ -49,9 +49,9 @@ function getClient(clients, property, value) {
         if (clients[i][property] === value) {
             return [clients[i], position];
         }
-        position+=1;
+        position += 1;
     }
-    return [false,false];
+    return [false, false];
 }
 
 function saveOffer(data, jsonObject) {
@@ -67,14 +67,14 @@ function saveOffer(data, jsonObject) {
     //save to client.json the new offer object
     console.log(jsonObject.creatorUserId);
     var [client, position] = getClient(data.clients, "clientId", jsonObject.creatorUserId);
-    if (client!== false) {
+    if (client !== false) {
         if (!checkIfTripDuplicate(data)) {
             data.clients[position].trips.push(offer);
             console.log("Trip id:" + offer.tripId + " was created and saved by EXISTING user id:" + offer.creatorUserId);
         }
     } else {
         // offer.userType = "external";
-        data.clients.push({clientId: jsonObject.creatorUserId, userType:"external", trips:[offer]});
+        data.clients.push({ clientId: jsonObject.creatorUserId, userType: "external", trips: [offer] });
         console.log("Trip id :" + offer.tripId + " was created and saved by NEW user id:" + offer.creatorUserId);
     }
     fs.writeFile('./clients.json', JSON.stringify(data), function (err) {
@@ -87,7 +87,7 @@ function saveOffer(data, jsonObject) {
 
 function saveInterestedUser(data, jsonObject) {
     var [client, position] = getClient(data.clients, "clientId", jsonObject.tripCreatorUserId);
-    if (client!== false) {
+    if (client !== false) {
         data.clients[position].trips.forEach(trip => {
             if (jsonObject.tripId === trip.tripId) {
                 if (trip.interestedUsers.includes(jsonObject.userId)) {

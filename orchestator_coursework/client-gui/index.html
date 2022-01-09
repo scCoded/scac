@@ -27,11 +27,11 @@
       <p>Submit a Trip</p>
       <form>
         <label>longitude:</label>
-        <input id="longitude" type="number" step="0.0001" />
+        <input id="longitude" type="number" step="0.0001" min="-90" max="90" required/>
         <label>latitude:</label>
-        <input id="latitude" type="number" step="0.0001" />
+        <input id="latitude" type="number" step="0.0001" min="-180" max="180" required/>
         <label for="tripDate">Trip proposal date:</label>
-        <input type="date" id="tripDate">
+        <input type="date" required id="tripDate">
         <input type="submit" />
       </form>
       <hr>
@@ -40,7 +40,7 @@
       <br>
       <div id="showUsersTrips"></div>
       <select id="usersTrips" style="visibility:hidden;"></select>
-      <button id="getInterestedUsers" style="visibility:hidden;">Confirm interested users?</button>
+      <button id="sendTripGoAhead" style="visibility:hidden;">Confirm interested users</button>
     </div>
     <div class="container container2">
       <div class="tripDetails">
@@ -55,19 +55,20 @@
       <hr>
       <div class="weather-container">
         <h3>Weather</h2>
-        <p id="area">Area: </p>
-        <p id="region">Region: </p>
-        <p id="country">Country: </p>
-        <p id="weatherDesc"> Description: </p>
-        <img id="img" src='https://upload.wikimedia.org/wikipedia/commons/4/46/Question_mark_%28black%29.svg'>
-        <p id="error" class="leave-space"></p>
-        <canvas id="weatherChart"></canvas>
+          <p id="area">Area: </p>
+          <p id="region">Region: </p>
+          <p id="country">Country: </p>
+          <p id="weatherDesc"> Description: </p>
+          <img id="img" src='https://upload.wikimedia.org/wikipedia/commons/4/46/Question_mark_%28black%29.svg'>
+          <p id="error" class="leave-space"></p>
+          <canvas id="weatherChart"></canvas>
       </div>
     </div>
   </div>
   <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
   <script type="text/javascript" src="./index.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+  <script src="https://smtpjs.com/v3/smtp.js"></script>
 </body>
 
 </html>

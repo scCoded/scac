@@ -17,16 +17,6 @@ const randomUrl = `https://api.random.org/json-rpc/4/invoke`;
 const { publishToQueue } = require('./RabbitMQ/publishToQueue.js')
 const { consume } = require('./RabbitMQ/consumer.js')
 
-app.post('/rabbit', async (req, res) => {
-  let { exchangeName, payload } = req.body;
-  try {
-    await publishToQueue(exchangeName, payload);
-    return res.status(200).json("Aight lad");
-  } catch (err) {
-    console.log(err);
-  }
-})
-
 function isDateValid(proposalDate) {
   // today is the minimum date to show a trip
   const todaysDate = new Date();
@@ -42,11 +32,15 @@ function isDateValid(proposalDate) {
 function getOtherTrips(userId) {
   var tripProposals = [];
   var data = JSON.parse(fs.readFileSync('clients.json'));
-  data.clients.forEach(function(client) {
+  data.clients.forEach(function (client) {
     if (client.clientId !== userId) {
-      client.trips.forEach(function(trip) {
+      client.trips.forEach(function (trip) {
+        var status = "not registered for trip";
         const proposalDate = new Date(trip.date);
-        if (client!== userId && isDateValid(proposalDate)) {
+        if (client !== userId && isDateValid(proposalDate)) {
+          if (trip.interestedUsers.includes(userId)) status = "registered for trip";
+          delete trip.interestedUsers;
+          trip.status = status;
           tripProposals.push(trip);
         }
       });
@@ -58,9 +52,9 @@ function getOtherTrips(userId) {
 function getUsersTrips(userId) {
   var tripProposals = [];
   var data = JSON.parse(fs.readFileSync('clients.json'));
-  data.clients.forEach(function(client) {
+  data.clients.forEach(function (client) {
     if (client.clientId === userId) {
-      client.trips.forEach(function(trip) {
+      client.trips.forEach(function (trip) {
         tripProposals.push(trip);
       });
     }
@@ -71,8 +65,8 @@ function getUsersTrips(userId) {
 function getInterestedUsers(tripId) {
   var interestedUsers = [];
   var data = JSON.parse(fs.readFileSync('clients.json'));
-  data.clients.forEach(function(client) {
-    client.trips.forEach(function(trip) {
+  data.clients.forEach(function (client) {
+    client.trips.forEach(function (trip) {
       if (trip.tripId === tripId) {
         interestedUsers = trip.interestedUsers;
       }
@@ -85,10 +79,10 @@ function isValidUser(userId) {
   var data = JSON.parse(fs.readFileSync('clients.json'));
   for (var i in data.clients) {
     if (data.clients[i].clientId === userId && data.clients[i].userType === "local") {
-      return {"valid": true};
+      return { "valid": true };
     }
   }
-  return {"valid": false};
+  return { "valid": false };
 }
 app.get(`/validateUserId/:userId`, async (req, res) => {
   res.send(isValidUser(req.params.userId));
@@ -114,7 +108,7 @@ app.get("/generateId/:idType", async (req, res) => {
     (result.data.result.random.data).forEach(number => {
       id += number;
     });
-    if (req.params.idType === "user") { 
+    if (req.params.idType === "user") {
       var data = JSON.parse(fs.readFileSync('clients.json'));
       var duplicateId = false;
       for (i in data.clients) {
@@ -123,7 +117,7 @@ app.get("/generateId/:idType", async (req, res) => {
         }
       }
       if (!duplicateId) {
-        data.clients.push({clientId: id, userType:"local", trips:[]});
+        data.clients.push({ clientId: id, userType: "local", trips: [] });
         fs.writeFile('clients.json', JSON.stringify(data), function (err) {
           if (err) {
             console.log(err);
@@ -180,7 +174,7 @@ app.get(`/weather/:tripId/:location/:date`, async (req, res) => {
         console.error(err);
       }
     } catch (err) {
-      res.send({"msg": "No weather data for this location"});
+      res.send({ "msg": "No weather data for this location" });
       console.error(err);
     }
   }

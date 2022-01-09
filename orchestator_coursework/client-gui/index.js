@@ -1,27 +1,28 @@
-// gets user to enter id or gives the user one before loading page.
+
 var span = document.createElement('span');
 //creates 2 week date restriction on submit form - date picker
 const todaysDate = new Date();
-const maxDate = new Date(todaysDate .getTime() + 12096e5);
+const maxDate = new Date(todaysDate.getTime() + 12096e5);
 document.getElementById("tripDate").setAttribute("min", todaysDate.toISOString().split('T')[0]);
 document.getElementById("tripDate").setAttribute("max", maxDate.toISOString().split('T')[0]);
 document.getElementById("tripDate").setAttribute("value", todaysDate.toISOString().split('T')[0]);
 
+// gets user to enter valid id or gives the user one before loading page.
 var userId = "";
 startPopup();
-async function startPopup(){
+async function startPopup() {
     userId = prompt("Enter your user id and hit OK. Or hit Cancel to generate a new userId.", "");
-    if (userId == null || userId == "") {   
+    if (userId == null || userId == "") {
         //generate user id
         userId = await generateId("user");
         welcomeUser(userId);
-        
+
     } else {
         fetch(`/validateUserId/${userId}`, {
             method: "GET",
             headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json"
+                Accept: "application/json",
+                "Content-Type": "application/json"
             }
         })
             .then(res => res.json())
@@ -30,15 +31,15 @@ async function startPopup(){
                     welcomeUser(userId);
                 } else {
                     alert("User id not a part of local users.");
-                    startPopup();     
-                }             
+                    startPopup();
+                }
             })
             .catch(err => console.log(err));
     }
 }
 
 function welcomeUser(userId) {
-    alert("Welcome User " + userId); 
+    alert("Welcome User " + userId);
     var title = document.getElementById("title");
     const node = document.createTextNode("Welcome User - " + userId);
     span.appendChild(node);
@@ -50,13 +51,13 @@ async function generateId(idType) {
     return await fetch(`/generateId/${idType}`, {
         method: "GET",
         headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json"
+            Accept: "application/json",
+            "Content-Type": "application/json"
         }
     })
         .then(res => res.text())
         .then(res => {
-            return res;         
+            return res;
         })
         .catch(err => console.log(err));
 };
@@ -83,8 +84,8 @@ function loadChart(hourlyData, region, date) {
         data: {
             labels: x,
             datasets: [{
-            data: y,
-            pointRadius: 3
+                data: y,
+                pointRadius: 3
             }]
         },
         options: {
@@ -96,21 +97,21 @@ function loadChart(hourlyData, region, date) {
                 text: 'Temperature against Time for ' + region + ' on the ' + date
             },
             scales: {
-                xAxes: [ {
-                  display: true,
-                  scaleLabel: {
+                xAxes: [{
                     display: true,
-                    labelString: 'Time (3 Hour Intervals)'
-                  }
-                } ],
-                yAxes: [ {
-                  display: true,
-                  scaleLabel: {
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'Time (3 Hour Intervals)'
+                    }
+                }],
+                yAxes: [{
                     display: true,
-                    labelString: 'Temperature oC'
-                  }
-                } ]
-              }
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'Temperature oC'
+                    }
+                }]
+            }
         }
     });
 }
@@ -125,8 +126,8 @@ function getTripWeatherAndInfo(tripType, madeBy) {
     fetch(`/weather/${tripId}/${location}/${date}`, {
         method: "GET",
         headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json"
+            Accept: "application/json",
+            "Content-Type": "application/json"
         }
     })
         .then(res => res.json())
@@ -141,9 +142,9 @@ function getTripWeatherAndInfo(tripType, madeBy) {
                 $("#weatherDesc").text("Description: " + res.weatherDesc);
                 $("#img").attr("src", res.weatherIconUrl);
                 $("#error").text("");
+                $("#madeBy").text(madeBy);
                 loadChart(res.hourly, res.locationData[0].region[0], date);
                 document.getElementById('weatherChart').style.visibility = "visible";
-                $("#madeBy").text(madeBy);
             } else {
                 $("#tripId").text("Trip Id: " + tripId);
                 $("#date").text("Date: " + date);
@@ -162,13 +163,16 @@ function getTripWeatherAndInfo(tripType, madeBy) {
 //each time trips dropdown box changed, get data about weather there.
 //give option to have location as a city name or as a postcode - 
 //https://www.worldweatheronline.com/developer/api/docs/search-api.aspx#q
-document.getElementById('otherTrips').onchange = function() {
-    $("#interestedUsers").text("");
-    var userId = JSON.parse(document.getElementById('otherTrips').value).creatorUserId;
-    getTripWeatherAndInfo('otherTrips', ' (Made by User ' + userId + ")");
+document.getElementById('otherTrips').onchange = function () {
+
+    var trip = JSON.parse(document.getElementById('otherTrips').value);
+    var creatorUserId = trip.creatorUserId;
+    var status = trip.status;
+    $("#interestedUsers").text("Your registration status: " + status);
+    getTripWeatherAndInfo('otherTrips', ' (Made by User ' + creatorUserId + ")");
 };
 
-document.getElementById('usersTrips').onchange = function() {
+document.getElementById('usersTrips').onchange = function () {
     getTripWeatherAndInfo('usersTrips', ' (Made by You)');
     getInterestedUsers();
 };
@@ -180,7 +184,7 @@ function showTripsWithDropdown(res, tripType, dropdownName, innerHTML, buttonNam
         var dropdown = document.getElementById(dropdownName);
         if (select.options.length > 0) {
             select.innerHTML = "";
-        }  
+        }
         if (dropdown.childNodes[0]) {
             dropdown.removeChild(dropdown.childNodes[0]);
         }
@@ -194,18 +198,19 @@ function showTripsWithDropdown(res, tripType, dropdownName, innerHTML, buttonNam
             select.appendChild(option);
         }
         select.value = blankOption.value;
-    
+
         var label = document.createElement("label");
         label.innerHTML = innerHTML;
         label.htmlFor = tripType;
         dropdown.appendChild(label).appendChild(select);
         document.getElementById(buttonName).style.visibility = "visible";
     } else {
-        console.log("No other trips right now");
+        notifyUser("No trips right now");
+        console.log("No trips right now");
         var select = document.getElementById(tripType);
         if (select.options.length > 0) {
             select.innerHTML = "";
-        }  
+        }
         document.getElementById(buttonName).style.visibility = "hidden";
     }
 }
@@ -214,8 +219,8 @@ document.getElementById("getOtherTrips").onclick = function () {
     fetch(`/trips/all/otherTrips/${userId}`, {
         method: "GET",
         headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json"
+            Accept: "application/json",
+            "Content-Type": "application/json"
         }
     })
         .then(res => res.json())
@@ -230,13 +235,13 @@ document.getElementById("getUsersTrips").onclick = function () {
     fetch(`/trips/all/usersTrips/${userId}`, {
         method: "GET",
         headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json"
+            Accept: "application/json",
+            "Content-Type": "application/json"
         }
     })
         .then(res => res.json())
         .then(res => {
-            showTripsWithDropdown(res, "usersTrips", "showUsersTrips", "Choose one of your trip proposals", "getInterestedUsers");
+            showTripsWithDropdown(res, "usersTrips", "showUsersTrips", "Choose one of your trip proposals", "sendTripGoAhead");
 
         })
         .catch(err => console.log(err));
@@ -250,9 +255,9 @@ document.getElementById("confirmInterest").onclick = async function () {
     fetch("/interest", {
         method: "POST",
         headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json"
-        }, 
+            Accept: "application/json",
+            "Content-Type": "application/json"
+        },
         body: JSON.stringify({
             messageId: messageId,
             tripId: interestedTrip.tripId,
@@ -262,7 +267,8 @@ document.getElementById("confirmInterest").onclick = async function () {
     })
         .then(res => res.text())
         .then(res => {
-        console.log(res);
+            notifyUser(res);
+            console.log(res);
         })
         .catch(err => console.log(err));
 }
@@ -276,8 +282,8 @@ function getInterestedUsers() {
     fetch(`/interest/${tripId}/${userId}`, {
         method: "GET",
         headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json"
+            Accept: "application/json",
+            "Content-Type": "application/json"
         },
     })
         .then(res => res.json())
@@ -285,7 +291,7 @@ function getInterestedUsers() {
             console.log(res);
             if (res.interestedUsers.length != 0) {
                 var intesteredUserIds = [];
-                (res.interestedUsers).forEach(function(user) {
+                (res.interestedUsers).forEach(function (user) {
                     intesteredUserIds.push(user);
                 });
                 $("#interestedUsers").text("Interested Users: " + intesteredUserIds);
@@ -294,7 +300,7 @@ function getInterestedUsers() {
                 $("#interestedUsers").text("Interested Users: No one is interested in this trip for now.");
                 console.log("No one is interested in this trip for now.")
             }
-            
+
         })
         .catch(err => console.log(err));
 }
@@ -313,21 +319,55 @@ async function sendData(e) {
     fetch("/trips/submit", {
         method: "POST",
         headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json"
-        }, 
+            Accept: "application/json",
+            "Content-Type": "application/json"
+        },
         body: JSON.stringify({
-        messageId: messageId,
-        tripId: tripId,
-        creatorUserId: userId,
-        longitude: longitude,
-        latitude: latitude,
-        date: date
+            messageId: messageId,
+            tripId: tripId,
+            creatorUserId: userId,
+            longitude: longitude,
+            latitude: latitude,
+            date: date
         })
     })
         .then(res => res.text())
         .then(res => {
-        console.log(res);
+            notifyUser(res);
+            console.log(res);
         })
         .catch(err => console.log(err));
+}
+
+document.getElementById("sendTripGoAhead").onclick = function () {
+    var trip = JSON.parse(document.getElementById('usersTrips').value);
+    var interestedUsers = trip.interestedUsers;
+    var tripId = trip.tripId;
+    if (interestedUsers.length === 0) {
+        notifyUser("No users to send an email about this trip to.");
+        console.log("No users to send an email about this trip to.");
+    } else {
+        interestedUsers.forEach(async function (user) {
+            await sendEmail(tripId, user);
+        })
+        notifyUser("sent confirmation email to users");
+    }
+}
+async function sendEmail(tripId, interestedUser) {
+    return await Email.send({
+        Host: "smtp.mailtrap.io",
+        Username: "aa42014ef14a30",
+        Password: "81c38ff6c90b23",
+        To: `user-${interestedUser}@SophiesTrips.com`,
+        From: `user-${userId}@SophiesTrips.com`,
+        Subject: `Hello User ${interestedUser} you are confirmed to go on Trip ${tripId}`,
+        Body: `<html><p>Hello User ${interestedUser},</p><br><p>You are confirmed to go on Trip ${tripId}. More info later.</p><br><p> Thanks!</p><br><p>From User ${userId}.</p></html>`
+    }).then(
+        console.log("sent confirmation email to user " + interestedUser)
+    );
+}
+
+function notifyUser(msg) {
+    $('body').prepend(`<div id="alert">${msg}</div>`);
+    $('#alert').fadeOut(2000);
 }

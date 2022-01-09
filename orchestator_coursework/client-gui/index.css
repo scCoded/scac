@@ -29,6 +29,7 @@ hr {
     align-items: center;
     border:2px solid black;
     border-bottom: none;
+    border-top: none;
     padding:30px;
 }
 .row:after {
@@ -98,4 +99,14 @@ canvas {
 .tripDetails span{
     font-size: 14px;
     vertical-align: -webkit-baseline-middle;
+}
+
+#alert {
+    z-index: 1;
+    position: absolute;
+    background-color: rgb(114, 179, 114);
+    border: 1px solid rgb(91, 153, 91);;
+    font-family: -apple-ssystem, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    margin: 2px;
+    padding: 2px;
 }
