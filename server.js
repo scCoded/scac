@@ -3,7 +3,8 @@ const bodyParser = require("body-parser");
 const axios = require("axios");
 const parseString = require("xml2js").parseString;
 const express = require("express");
-
+const router = express.Router();
+const path = require('path');
 const app = express();
 
 app.use(bodyParser.json());
@@ -212,6 +213,103 @@ function isValidUser(userId) {
   }
   return { "valid": false };
 }
+
+app.get('/admin',function(req,res){
+  res.sendFile((path.join(__dirname+'/client-gui/admin/index.html')));
+});
+
+//ADMIN panel endpoints
+//remove user
+app.post("/deleteUser", async (req, res) => {
+  var response = "Could not remove user. Make sure id is correct.";
+  const deleteUserId = req.body.deleteUserId;
+  console.log(deleteUserId);
+  var data = JSON.parse(fs.readFileSync('clients.json'));
+  for (var i in data.clients) {
+    if (data.clients[i].clientId === deleteUserId) {
+      data.clients.splice(i, 1);
+      response = "Deleted user " + deleteUserId + " and their trips successfully.";
+      fs.writeFile('clients.json', JSON.stringify(data), function (err) {
+        if (err) {
+          console.log(err);
+        }
+        console.log("The file was saved with deleted user.");
+      });
+    }
+  }
+  res.send(response);
+});
+
+//remove trip with trip id
+app.post("/deleteTrip", async (req, res) => {
+  var response = "Could not remove trip. Make sure id is correct."; 
+  const deleteTripId = req.body.deleteTripId;
+  var data = JSON.parse(fs.readFileSync('clients.json'));
+  data.clients.forEach(function (client) {
+    client.trips.forEach(function (trip) {
+      if (trip.tripId === deleteTripId) {
+        client.trips.splice(client.trips.indexOf(trip), 1);
+        response = "Deleted trip " + deleteTripId + " successfully.";
+        fs.writeFile('clients.json', JSON.stringify(data), function (err) {
+          if (err) {
+            console.log(err);
+          }
+          console.log("The file was saved with deleted trip.");
+        });
+      }
+    });
+  });
+  res.send(response);
+});
+
+//remove interested user from trip
+app.post("/deleteUserFromTrip", async (req, res) => {
+  var response = "Could not remove interested user from trip. Make sure id's is correct."; 
+  const tripId = req.body.tripId;
+  const deleteUserId = req.body.deleteUserId;
+  var data = JSON.parse(fs.readFileSync('clients.json'));
+  data.clients.forEach(function (client) {
+    client.trips.forEach(function (trip) {
+      if (trip.tripId === tripId && trip.interestedUsers.includes(deleteUserId)) {
+        var i = trip.interestedUsers.indexOf(deleteUserId);
+        trip.interestedUsers.splice(i, 1);
+        response = "Deleted user " + deleteUserId + " from trip "+ tripId + "successfully.";
+        fs.writeFile('clients.json', JSON.stringify(data), function (err) {
+          if (err) {
+            console.log(err);
+          }
+          console.log("The file was saved with deleted interested user.");
+        });
+        return;
+      }
+    });
+  });
+  res.send(response);
+});
+
+//remove all interested users from trip
+app.post("/deleteUsersFromTrip", async (req, res) => {
+  var response = "Could not remove interested user from trip. Trip may have no interested users. Make sure id is correct."; 
+  const tripId = req.body.tripId;
+  var data = JSON.parse(fs.readFileSync('clients.json'));
+  data.clients.forEach(function (client) {
+    client.trips.forEach(function (trip) {
+      if (trip.tripId === tripId && trip.interestedUsers.length > 0) {
+        trip.interestedUsers = [];
+        response = "Deleted all interested users from " + tripId + " successfully.";
+        fs.writeFile('clients.json', JSON.stringify(data), function (err) {
+          if (err) {
+            console.log(err);
+          }
+          console.log("The file was saved with all interested users deleted.");
+        });
+        return;
+      }
+    });
+  });
+  res.send(response);
+});
+
 
 app.listen((process.env.PORT || 5000), () => {
   consume();

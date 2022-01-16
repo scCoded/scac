@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Panel</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="../index.css">
+</head>
+
+<body>
+    <div style="padding: 20px;">
+        <div style="padding-bottom: 20px;">
+            <i class="material-icons">account_circle</i>
+            <h1 id="title">Admin Panel</h1>
+        </div>
+        <div style="padding-bottom: 40px;">
+            <label>Delete user (by user id):</label>
+            <input id="deleteUserValue" type="text">
+            <button id="deleteUserButton">Delete user</button>
+        </div>
+        <div style="padding-bottom: 40px;">
+            <label>Delete trip (by trip id):</label>
+            <input id="deleteTripValue" type="text">
+            <button id="deleteTripButton">Delete user</button>
+        </div>
+        <div style="padding-bottom: 40px;">
+            <label>Remove interested user from trip ( trip id, by user id):</label>
+            <label>Trip id:</label>
+            <input id="deleteUserFromTripValue_trip" type="text">
+            <label>Interested user id:</label>
+            <input id="deleteUserFromTripValue_user" type="text">
+            <button id="deleteUserFromTripButton">Delete interested user</button>
+        </div>
+        <div style="padding-bottom: 40px;">
+            <label>Remove all interested users from (by trip id):</label>
+            <input id="deleteUsersFromTripValue" type="text">
+            <button id="deleteUsersFromTripButton">Delete interested users</button>
+        </div>
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
+        <script type="text/javascript" src="./index.js"></script>
+</body>
+
+</html>
