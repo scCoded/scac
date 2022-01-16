@@ -145,12 +145,7 @@ app.get("/generateId/:idType", async (req, res) => {
       }
       if (!duplicateId) {
         data.clients.push({ clientId: id, userType: "local", trips: [] });
-        fs.writeFile('clients.json', JSON.stringify(data), function (err) {
-          if (err) {
-            console.log(err);
-          }
-          console.log("The file was saved with new local user!");
-        });
+        saveClientJSONFile(data, "The file was saved with new local user!");
       }
     }
     res.send(id);
@@ -229,12 +224,7 @@ app.post("/deleteUser", async (req, res) => {
     if (data.clients[i].clientId === deleteUserId) {
       data.clients.splice(i, 1);
       response = "Deleted user " + deleteUserId + " and their trips successfully.";
-      fs.writeFile('clients.json', JSON.stringify(data), function (err) {
-        if (err) {
-          console.log(err);
-        }
-        console.log("The file was saved with deleted user.");
-      });
+      saveClientJSONFile(data, "The file was saved with deleted user.");
     }
   }
   res.send(response);
@@ -250,12 +240,8 @@ app.post("/deleteTrip", async (req, res) => {
       if (trip.tripId === deleteTripId) {
         client.trips.splice(client.trips.indexOf(trip), 1);
         response = "Deleted trip " + deleteTripId + " successfully.";
-        fs.writeFile('clients.json', JSON.stringify(data), function (err) {
-          if (err) {
-            console.log(err);
-          }
-          console.log("The file was saved with deleted trip.");
-        });
+        saveClientJSONFile(data, "The file was saved with deleted trip.");
+        return
       }
     });
   });
@@ -274,12 +260,7 @@ app.post("/deleteUserFromTrip", async (req, res) => {
         var i = trip.interestedUsers.indexOf(deleteUserId);
         trip.interestedUsers.splice(i, 1);
         response = "Deleted user " + deleteUserId + " from trip "+ tripId + "successfully.";
-        fs.writeFile('clients.json', JSON.stringify(data), function (err) {
-          if (err) {
-            console.log(err);
-          }
-          console.log("The file was saved with deleted interested user.");
-        });
+        saveClientJSONFile(data, "The file was saved with deleted interested user.");
         return;
       }
     });
@@ -297,12 +278,7 @@ app.post("/deleteUsersFromTrip", async (req, res) => {
       if (trip.tripId === tripId && trip.interestedUsers.length > 0) {
         trip.interestedUsers = [];
         response = "Deleted all interested users from " + tripId + " successfully.";
-        fs.writeFile('clients.json', JSON.stringify(data), function (err) {
-          if (err) {
-            console.log(err);
-          }
-          console.log("The file was saved with all interested users deleted.");
-        });
+        saveClientJSONFile(data, "The file was saved with all interested users deleted.");
         return;
       }
     });
@@ -310,6 +286,14 @@ app.post("/deleteUsersFromTrip", async (req, res) => {
   res.send(response);
 });
 
+function saveClientJSONFile(data, msg) {
+  fs.writeFile('clients.json', JSON.stringify(data), function (err) {
+    if (err) {
+      console.log(err);
+    }
+    console.log(msg);
+  });
+}
 
 app.listen((process.env.PORT || 5000), () => {
   consume();
