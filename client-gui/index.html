@@ -26,10 +26,12 @@
       <hr>
       <p>Submit a Trip</p>
       <form>
+        <label>City or postcode (optional):</label>
+        <input id="location" type="text"/>
         <label>longitude:</label>
-        <input id="longitude" type="number" step="0.0001" min="-90" max="90" required/>
+        <input id="longitude" type="number" step="any" min="-90" max="90" required/>
         <label>latitude:</label>
-        <input id="latitude" type="number" step="0.0001" min="-180" max="180" required/>
+        <input id="latitude" type="number" step="any" min="-180" max="180" required/>
         <label for="tripDate">Trip proposal date:</label>
         <input type="date" required id="tripDate">
         <input type="submit" />
@@ -69,6 +71,6 @@
   <script type="text/javascript" src="./index.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
   <script src="https://smtpjs.com/v3/smtp.js"></script>
+  <script type="text/javascript"src="https://maps.google.com/maps/api/js?key=AIzaSyBWHMH24IgysYwHGlfc1DRkQdEKmgJD8cM"></script> 
 </body>
-
 </html>

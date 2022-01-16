@@ -203,7 +203,6 @@ async function sendData(e) {
     const latitude = document.getElementById("latitude").value;
     //make sure date is not in the past + not further than 14 days away.
     const date = document.getElementById("tripDate").value;
-
     fetch("/trips/submit", {
         method: "POST",
         headers: {
@@ -341,6 +340,32 @@ function loadChart(hourlyData, region, date) {
                     }
                 }]
             }
+        }
+    });
+}
+
+$("#location").blur(function() {
+    getCoordinates();
+})
+
+$("#location").bind('keyup', function (e) {
+    if (e.key === 'Enter' || e.keyCode === 13) {
+        getCoordinates();
+    }
+});
+
+function getCoordinates() {
+    var location = document.getElementById("location").value;
+    console.log(location);
+    var geocoder = new google.maps.Geocoder();
+    geocoder.geocode( { "address": location}, function(results, status) {
+        console.log(status);
+        console.log(results);
+        if (status == "OK") {
+            $("#longitude").val(results[0].geometry.location.lat());
+            $("#latitude").val(results[0].geometry.location.lng());
+        } else {
+            notifyUser("This location is not acceptable");
         }
     });
 }
