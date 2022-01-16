@@ -32,6 +32,7 @@ const intentSchema = {
 const validateOffer = ajv.compile(offerSchema);
 const validateIntent = ajv.compile(intentSchema);
 
+//checks if consumed trip proposal id is duplicate
 function checkIfTripDuplicate(data) {
     for (client in data.clients) {
         for (trip in client.trips) {
@@ -44,6 +45,7 @@ function checkIfTripDuplicate(data) {
     return false;
 }
 
+//returns client data and position in clients.json file based on match between property, value passed.
 function getClient(clients, property, value) {
     var position = 0;
     for (var i in clients) {
@@ -55,6 +57,7 @@ function getClient(clients, property, value) {
     return [false, false];
 }
 
+//save trip offer to clients.json
 function saveOffer(data, jsonObject) {
     var offer = {
         messageId: jsonObject.messageId,
@@ -74,7 +77,6 @@ function saveOffer(data, jsonObject) {
             console.log("Trip id:" + offer.tripId + " was created and saved by EXISTING user id:" + offer.creatorUserId);
         }
     } else {
-        // offer.userType = "external";
         data.clients.push({ clientId: jsonObject.creatorUserId, userType: "external", trips: [offer] });
         console.log("Trip id :" + offer.tripId + " was created and saved by NEW user id:" + offer.creatorUserId);
     }
@@ -86,6 +88,7 @@ function saveOffer(data, jsonObject) {
     });
 }
 
+//save trip intent to clients.json
 function saveInterestedUser(data, jsonObject) {
     var [client, position] = getClient(data.clients, "clientId", jsonObject.tripCreatorUserId);
     if (client !== false) {

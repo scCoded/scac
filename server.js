@@ -1,5 +1,4 @@
 const fs = require("fs");
-const path = require("path");
 const bodyParser = require("body-parser");
 const axios = require("axios");
 const parseString = require("xml2js").parseString;
@@ -17,17 +16,14 @@ const randomUrl = `https://api.random.org/json-rpc/4/invoke`;
 const { publishToQueue } = require('./RabbitMQ/publishToQueue.js')
 const { consume } = require('./RabbitMQ/consumer.js')
 
-function isDateValid(proposalDate) {
-  // today is the minimum date to show a trip
-  const todaysDate = new Date();
-  todaysDate.setHours(0, 0, 0, 0);
-  // 14 days from today is the max date
-  const maxDate = new Date(todaysDate.getTime() + 12096e5);
-  if (proposalDate >= todaysDate && proposalDate <= maxDate) {
-    return true;
+//get trips
+app.get(`/trips/all/:type/:userId`, (req, res) => {
+  if (req.params.type === "otherTrips") {
+    res.send(getOtherTrips(req.params.userId));
+  } else {
+    res.send(getUsersTrips(req.params.userId));
   }
-  else return false;
-}
+});
 
 function getOtherTrips(userId) {
   var tripProposals = [];
@@ -49,6 +45,18 @@ function getOtherTrips(userId) {
   return tripProposals;
 }
 
+function isDateValid(proposalDate) {
+  // today is the minimum date to show a trip
+  const todaysDate = new Date();
+  todaysDate.setHours(0, 0, 0, 0);
+  // 14 days from today is the max date
+  const maxDate = new Date(todaysDate.getTime() + 12096e5);
+  if (proposalDate >= todaysDate && proposalDate <= maxDate) {
+    return true;
+  }
+  else return false;
+}
+
 function getUsersTrips(userId) {
   var tripProposals = [];
   var data = JSON.parse(fs.readFileSync('clients.json'));
@@ -61,6 +69,27 @@ function getUsersTrips(userId) {
   });
   return tripProposals;
 }
+
+//post interest in trip
+app.post("/interest", async (req, res) => {
+  try {
+    await publishToQueue("TRAVEL_INTENT", req.body);
+    return res.status(200).json("Interest submitted");
+  } catch (err) {
+    console.log(err)
+  }
+  res.send(`Interest Sent`);
+});
+
+//get interest in trip
+app.get(`/interest/:tripId/:userId`, (req, res) => {
+  var json = {
+    tripId: req.params.tripId,
+    userId: req.params.userId,
+    interestedUsers: getInterestedUsers(req.params.tripId)
+  }
+  res.send(json);
+});
 
 function getInterestedUsers(tripId) {
   var interestedUsers = [];
@@ -75,21 +104,18 @@ function getInterestedUsers(tripId) {
   return interestedUsers;
 }
 
-function isValidUser(userId) {
-  var data = JSON.parse(fs.readFileSync('clients.json'));
-  for (var i in data.clients) {
-    if (data.clients[i].clientId === userId && data.clients[i].userType === "local") {
-      return { "valid": true };
-    }
+//post trip
+app.post("/trips/submit", async (req, res) => {
+  try {
+    await publishToQueue("TRAVEL_OFFERS", req.body);
+    return res.status(200).json("Trip submitted");
+  } catch (err) {
+    console.log(err)
   }
-  return { "valid": false };
-}
-app.get(`/validateUserId/:userId`, async (req, res) => {
-  res.send(isValidUser(req.params.userId));
+  res.send(`Trip submitted`);
 });
 
-
-
+//generate an id, if it's a user id make sure the id does not clash with existing id in clients.json
 app.get("/generateId/:idType", async (req, res) => {
   var json = {
     "jsonrpc": "2.0",
@@ -132,7 +158,7 @@ app.get("/generateId/:idType", async (req, res) => {
   }
 });
 
-
+//get weather for trip, send data from weather.json if data exists already, if not call weather api + save to weather.json + send to user. 
 app.get(`/weather/:tripId/:location/:date`, async (req, res) => {
   var weather = JSON.parse(fs.readFileSync('weather.json'));
   if (weather.hasOwnProperty(req.params.tripId)) {
@@ -140,14 +166,6 @@ app.get(`/weather/:tripId/:location/:date`, async (req, res) => {
     res.send(weather[req.params.tripId]);
   } else {
     try {
-      //*create on FE weather graph on RHS of page. For other rest calls display other info on RHS too!
-      /*
-      //var weather = {};
-      for (var i in result.data.data.weather[0].hourly){
-        console.log("Hour", i);
-        console.log(result.data.data.weather[0].hourly[i]);
-        //append to weather json; then make weather graph with icon and time and temp on FE.
-      }*/
       result = await axios.get(`${weatherUrl}${req.params.location}&date=${req.params.date}`);
       var json = {
         weatherIconUrl: result.data.data.current_condition[0].weatherIconUrl[0].value,
@@ -180,44 +198,20 @@ app.get(`/weather/:tripId/:location/:date`, async (req, res) => {
   }
 });
 
-app.get(`/trips/all/:type/:userId`, (req, res) => {
-  if (req.params.type === "otherTrips") {
-    res.send(getOtherTrips(req.params.userId));
-  } else {
-    res.send(getUsersTrips(req.params.userId));
-  }
+//validate user is part of local users in clients.json file
+app.get(`/validateUserId/:userId`, async (req, res) => {
+  res.send(isValidUser(req.params.userId));
 });
 
-app.post("/interest", async (req, res) => {
-  try {
-    await publishToQueue("TRAVEL_INTENT", req.body);
-    return res.status(200).json("Interest submitted");
-  } catch (err) {
-    console.log(err)
+function isValidUser(userId) {
+  var data = JSON.parse(fs.readFileSync('clients.json'));
+  for (var i in data.clients) {
+    if (data.clients[i].clientId === userId && data.clients[i].userType === "local") {
+      return { "valid": true };
+    }
   }
-  res.send(`Interest Sent`);
-});
-
-app.get(`/interest/:tripId/:userId`, (req, res) => {
-  var json = {
-    tripId: req.params.tripId,
-    userId: req.params.userId,
-    interestedUsers: getInterestedUsers(req.params.tripId)
-  }
-  res.send(json);
-});
-
-
-app.post("/trips/submit", async (req, res) => {
-  try {
-    await publishToQueue("TRAVEL_OFFERS", req.body);
-    return res.status(200).json("Trip submitted");
-  } catch (err) {
-    console.log(err)
-  }
-  res.send(`Trip submitted`);
-});
-
+  return { "valid": false };
+}
 
 app.listen((process.env.PORT || 5000), () => {
   consume();
