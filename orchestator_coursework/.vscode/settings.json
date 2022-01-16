@@ -1,0 +1,4 @@
+{
+    "appService.deploySubpath": ".",
+    "appService.defaultWebAppToDeploy": "/subscriptions/aa876696-e5b5-49cd-b43d-377e6987daa5/resourceGroups/test/providers/Microsoft.Web/sites/ServiceCentricAndCloud"
+}
