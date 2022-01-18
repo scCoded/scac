@@ -2,8 +2,9 @@ const fs = require("fs");
 const Ajv = require("ajv");
 const ajv = new Ajv();
 const amqp = require('amqplib/callback_api');
-//const CONN_URL = 'amqp://student:COMP30231@152.71.155.95';
-const CONN_URL = 'amqps://wtofolaf:jral1GwoT_7I-ldRS5gJqCoSMS_lCGmo@rattlesnake.rmq.cloudamqp.com/wtofolaf';
+const CONN_URL = 'amqp://student:COMP30231@152.71.155.95';
+//const CONN_URL = 'amqps://wtofolaf:jral1GwoT_7I-ldRS5gJqCoSMS_lCGmo@rattlesnake.rmq.cloudamqp.com/wtofolaf'; - personal rabbitmq
+//https://sccc-coursework.herokuapp.com/ - cloud app
 
 const offerSchema = {
     type: "object",

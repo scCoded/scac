@@ -14,7 +14,7 @@ const weatherUrl = `https://api.worldweatheronline.com/premium/v1/weather.ashx?k
 const weatherLocationUrl = `https://api.worldweatheronline.com/premium/v1/search.ashx?key=2001169f333b4d12b60145652212312&num_of_results=1&format=xml&q=`;
 const randomUrl = `https://api.random.org/json-rpc/4/invoke`;
 
-const { publishToQueue } = require('./RabbitMQ/publishToQueue.js')
+const { publish } = require('./RabbitMQ/publisher.js')
 const { consume } = require('./RabbitMQ/consumer.js')
 
 //get trips
@@ -74,7 +74,7 @@ function getUsersTrips(userId) {
 //post interest in trip
 app.post("/interest", async (req, res) => {
   try {
-    await publishToQueue("TRAVEL_INTENT", req.body);
+    await publish("TRAVEL_INTENT", req.body);
     return res.status(200).json("Interest submitted");
   } catch (err) {
     console.log(err)
@@ -108,7 +108,7 @@ function getInterestedUsers(tripId) {
 //post trip
 app.post("/trips/submit", async (req, res) => {
   try {
-    await publishToQueue("TRAVEL_OFFERS", req.body);
+    await publish("TRAVEL_OFFERS", req.body);
     return res.status(200).json("Trip submitted");
   } catch (err) {
     console.log(err)

@@ -1,4 +1,52 @@
 {
     "clients": [
+        {
+            "clientId": "254147270",
+            "userType": "local",
+            "trips": [
+                {
+                    "messageId": "982126132",
+                    "tripId": "458205953",
+                    "creatorUserId": "254147270",
+                    "longitude": "52.95478319999999",
+                    "latitude": "-1.1581086",
+                    "date": "2022-01-29",
+                    "interestedUsers": []
+                },
+                {
+                    "messageId": "373867497",
+                    "tripId": "003452646",
+                    "creatorUserId": "254147270",
+                    "longitude": "51.5072178",
+                    "latitude": "-0.1275862",
+                    "date": "2022-01-25",
+                    "interestedUsers": []
+                },
+                {
+                    "messageId": "708100648",
+                    "tripId": "184832812",
+                    "creatorUserId": "254147270",
+                    "longitude": "51.7898925",
+                    "latitude": "-0.1945705",
+                    "date": "2022-01-25",
+                    "interestedUsers": []
+                }
+            ]
+        },
+        {
+            "clientId": "748067919",
+            "userType": "local",
+            "trips": []
+        },
+        {
+            "clientId": "007499345",
+            "userType": "local",
+            "trips": []
+        },
+        {
+            "clientId": "459127001",
+            "userType": "local",
+            "trips": []
+        }
     ]
 }
